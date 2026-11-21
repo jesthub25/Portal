@@ -1,0 +1,119 @@
+# ============================================================
+#  Portal - Ayar Dosyasi  (Minecraft 1.16.5 - 1.21.x)
+#  Degisikliklerden sonra: /portal yenile
+#
+#  Renkler: &a, &c, &l ... ve 1.16+ HEX renk: &#FFAA00
+#  Bir mesaji tamamen kapatmak icin degerini "" yapin.
+# ============================================================
+
+settings:
+  # Ayni oyuncunun portallar arasi iki isinlanmasi arasindaki minimum sure (saniye).
+  # Ard arda portala girisi engeller.
+  teleport-cooldown: 3
+
+  # Uyari mesajlarinin (yetki yok, bekleme suresi, hedef yok) tekrar gonderilme suresi (saniye).
+  warning-cooldown: 3
+
+  # Yetkisi olmayan oyuncu portaldan kac blok geriye atilsin.
+  pushback-distance: 3
+
+  # Geri atildiktan sonra uygulanan savrulma kuvveti (yatay). 0 = savrulma yok. Onerilen: 0.4 - 1.2
+  pushback-strength: 0.8
+
+  # Savrulmanin yukari yonlu kuvveti. Onerilen: 0.2 - 0.5
+  pushback-vertical: 0.35
+
+  # portal.admin yetkisine sahip oyuncular portal.<ad> yetkisi olmadan da tum portallari kullanabilsin mi?
+  admin-bypass: true
+
+  # Isinlanma bekleme suresindeyken portala girmeye calisan oyuncu durdurulsun mu?
+  # true: oyuncu portala giremez ve uyari alir. false: portalin icinde durabilir ama isinlanmaz.
+  block-entry-on-cooldown: true
+
+  # Isinlanma ve geri atilma sesleri (namespaced ses anahtari). Kapatmak icin "" yapin.
+  teleport-sound: "minecraft:entity.enderman.teleport"
+  deny-sound: "minecraft:entity.villager.no"
+  sound-volume: 1.0
+  sound-pitch: 1.0
+
+messages:
+  prefix: "&8[&6Portal&8] &r"
+
+  no-permission: "&cBu komutu kullanmak için yetkiniz yok!"
+  only-players: "&cBu komut sadece oyuncular tarafından kullanılabilir!"
+  unknown-subcommand: "&cBilinmeyen alt komut. &7Yardım için: &e/portal"
+
+  # {name}
+  portal-no-permission: "&cBu portalı kullanmak için &eportal.{name} &cyetkisine ihtiyacınız var!"
+  # {name} {seconds}
+  portal-cooldown: "&cTekrar portal kullanabilmek için &e{seconds} &csaniye beklemelisiniz."
+  # {name}
+  portal-no-destination: "&cBu portalın ışınlanma noktası ayarlanmamış! &8(&e{name}&8)"
+  # {name} {world}
+  portal-destination-world-missing: "&cBu portalın hedef dünyası yüklü değil: &e{world}"
+  # {name}
+  teleported: "&aIşınlandınız! &8(&e{name}&8)"
+
+  worldedit-missing: "&cWorldEdit veya FastAsyncWorldEdit yüklü değil!"
+  no-selection: "&cÖnce WorldEdit wand ile pos1 ve pos2 seçin!"
+  selection-not-cuboid: "&cSadece küp (cuboid) seçimler desteklenir! &7(//sel cuboid)"
+  selection-world-missing: "&cSeçimin yapıldığı dünya bulunamadı!"
+  selection-error: "&cWorldEdit seçimi okunamadı! Konsolu kontrol edin."
+
+  # {name}
+  invalid-name: "&cGeçersiz portal adı: &e{name} &7(sadece harf, rakam, _ ve -, en fazla 32 karakter)"
+  reserved-name: "&cBu isim sistem tarafından ayrılmıştır: &e{name}"
+  portal-exists: "&cBu isimde bir portal zaten var: &e{name}"
+  portal-not-found: "&cPortal bulunamadı: &e{name}"
+  # {name} {world} {x1} {y1} {z1} {x2} {y2} {z2}
+  portal-created: "&aPortal oluşturuldu: &e{name} &8(&7{x1},{y1},{z1} &8→ &7{x2},{y2},{z2}&8) &7Şimdi: &e/portal tphere {name}"
+  portal-deleted: "&aPortal kalıcı olarak silindi: &e{name}"
+  # {name} {world} {x} {y} {z} {yaw} {pitch}
+  destination-set: "&aIşınlanma noktası ayarlandı: &e{name} &8(&7{world} {x}, {y}, {z} &8| &7yaw {yaw}, pitch {pitch}&8)"
+  # {name} {pos} {x} {y} {z}
+  position-updated: "&a{pos} güncellendi: &e{name} &8→ &fX:{x} Y:{y} Z:{z}"
+  invalid-position: "&cGeçersiz konum! &epos1 &cveya &epos2 &ckullanın."
+  invalid-coordinate: "&cGeçersiz koordinat: &e{value} &7(tam sayı veya ~ kullanın)"
+  reloaded: "&aAyarlar ve portallar yeniden yüklendi. &7({count} portal)"
+
+  usage-create: "&cKullanım: &e/portal oluştur <ad>"
+  usage-tphere: "&cKullanım: &e/portal tphere <ad>"
+  usage-edit: "&cKullanım: &e/portal düzenle <ad> <pos1|pos2> <x> <y> <z>"
+  usage-delete: "&cKullanım: &e/portal sil <ad>"
+  usage-info: "&cKullanım: &e/portal bilgi <ad>"
+
+  # /portal liste  — {count} {list}
+  list-empty: "&7Kayıtlı portal yok."
+  list: "&6Portallar &8({count})&7: &e{list}"
+  list-separator: "&7, &e"
+
+  # /portal (yardım) — sadece yetkili olduğu satırlar gösterilir
+  help-header:
+    - "&8&m------------------------------------"
+    - "  &6&lPortal &7komutları"
+    - "&8&m------------------------------------"
+  help-create: "  &e/portal oluştur &b<ad> &8- &7WorldEdit seçiminden portal oluşturur"
+  help-tphere: "  &e/portal tphere &b<ad> &8- &7Bulunduğun konumu hedef yapar"
+  help-edit: "  &e/portal düzenle &b<ad> <pos1|pos2> <x> <y> <z> &8- &7Koordinat değiştirir"
+  help-delete: "  &e/portal sil &b<ad> &8- &7Portalı kalıcı siler"
+  help-info: "  &e/portal bilgi &b<ad> &8- &7Portal bilgisi"
+  help-list: "  &e/portal liste &8- &7Tüm portallar"
+  help-reload: "  &e/portal yenile &8- &7Ayarları yeniden yükler"
+  help-footer:
+    - "&8&m------------------------------------"
+
+  # /portal bilgi — sadece komutu yazan görür
+  # {name} {world} {x1} {y1} {z1} {x2} {y2} {z2} {sizeX} {sizeY} {sizeZ} {permission} {destination}
+  info:
+    - "&8&m------------------------------------"
+    - "  &6&lPortal: &e{name}"
+    - "  &7Dünya: &f{world}"
+    - "  &7Pos1: &fX:&a{x1} &fY:&a{y1} &fZ:&a{z1}"
+    - "  &7Pos2: &fX:&a{x2} &fY:&a{y2} &fZ:&a{z2}"
+    - "  &7Boyut: &f{sizeX}x{sizeY}x{sizeZ}"
+    - "  &7Yetki: &f{permission}"
+    - "  &7Hedef: {destination}"
+    - "&8&m------------------------------------"
+  # {world} {x} {y} {z} {yaw} {pitch}
+  info-destination: "&b{world} &fX:&b{x} &fY:&b{y} &fZ:&b{z} &8| &fYaw:&b{yaw} &fPitch:&b{pitch}"
+  info-no-destination: "&cAyarlanmamış &7(/portal tphere <ad>)"

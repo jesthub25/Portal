@@ -1,0 +1,10 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.DS_Store
+test/node_modules/
+test/package-lock.json
+server/
+dist/

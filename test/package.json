@@ -1,0 +1,9 @@
+{
+  "name": "portal-integration-test",
+  "private": true,
+  "description": "Real-server integration tests for the Portal plugin (Paper + WorldEdit + mineflayer bots)",
+  "dependencies": {
+    "mineflayer": "^4.33.0",
+    "vec3": "^0.1.10"
+  }
+}

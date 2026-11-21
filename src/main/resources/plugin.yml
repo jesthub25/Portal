@@ -1,0 +1,60 @@
+name: Portal
+version: '${project.version}'
+main: org.jestron.portal.PortalPlugin
+api-version: '1.16'
+author: Jestron
+description: WorldEdit secimi ile portal olusturma eklentisi (1.16.5 - 1.21.x)
+softdepend: [WorldEdit, FastAsyncWorldEdit]
+
+commands:
+  portal:
+    description: Portal yonetim komutlari
+    usage: /portal
+    # Bu yetkiye sahip olmayan oyuncular komutu sohbet onerilerinde hic goremez.
+    permission: portal.command
+
+permissions:
+  portal.command:
+    description: /portal komutunu gorme yetkisi (alt yetkilerle otomatik verilir)
+    default: op
+  portal.create:
+    description: /portal olustur
+    default: op
+    children:
+      portal.command: true
+  portal.tphere:
+    description: /portal tphere
+    default: op
+    children:
+      portal.command: true
+  portal.edit:
+    description: /portal duzenle
+    default: op
+    children:
+      portal.command: true
+  portal.delete:
+    description: /portal sil
+    default: op
+    children:
+      portal.command: true
+  portal.info:
+    description: /portal bilgi ve /portal liste
+    default: op
+    children:
+      portal.command: true
+  portal.reload:
+    description: /portal yenile
+    default: op
+    children:
+      portal.command: true
+  portal.admin:
+    description: Tum portal komutlari (+ config'de admin-bypass acik ise tum portallari kullanma)
+    default: op
+    children:
+      portal.command: true
+      portal.create: true
+      portal.tphere: true
+      portal.edit: true
+      portal.delete: true
+      portal.info: true
+      portal.reload: true
