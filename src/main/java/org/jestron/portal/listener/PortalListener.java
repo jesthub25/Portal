@@ -10,6 +10,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -22,6 +23,7 @@ import org.jestron.portal.model.Portal;
 import org.jestron.portal.util.Settings;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
@@ -125,6 +127,32 @@ public final class PortalListener implements Listener {
             tryTeleport(player, portal, alreadyInside, null);
         }
     }
+
+    // =================================================================== komut gorunurlugu
+
+    /**
+     * Yetkisi olmayan oyuncunun istemcisine gonderilen komut agacindan /portal ve /portal:portal
+     * cikarilir; boylece komut sohbet onerilerinde hic gorunmez (1.13+ tum surumler).
+     */
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCommandSend(PlayerCommandSendEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasPermission("portal.command") || player.hasPermission("portal.admin")) return;
+        for (String sub : COMMAND_PERMISSIONS) {
+            if (player.hasPermission(sub)) return;
+        }
+        Iterator<String> it = event.getCommands().iterator();
+        while (it.hasNext()) {
+            String label = it.next();
+            if (label.equalsIgnoreCase("portal") || label.equalsIgnoreCase("portal:portal")) {
+                it.remove();
+            }
+        }
+    }
+
+    private static final String[] COMMAND_PERMISSIONS = {
+            "portal.create", "portal.tphere", "portal.edit", "portal.delete", "portal.info", "portal.reload"
+    };
 
     // =================================================================== temizlik
 

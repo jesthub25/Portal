@@ -58,8 +58,13 @@ jobs:
         include:
           - mc: '1.16.5'
             java: '11'
+            worldedit: '7.2.'
           - mc: '1.21.4'
             java: '21'
+            worldedit: '7.3.'
+          - mc: '1.21.11'
+            java: '21'
+            worldedit: '7.3.'
     steps:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v5
@@ -76,7 +81,7 @@ jobs:
       - name: Download Paper + WorldEdit
         run: |
           set -o pipefail
-          python3 test/fetch-server.py "${{ matrix.mc }}" server 2>&1 | tee fetch.log
+          python3 test/fetch-server.py "${{ matrix.mc }}" server "${{ matrix.worldedit }}" 2>&1 | tee fetch.log
           cp dist/Portal-*.jar server/plugins/
           ls -la server server/plugins
       - name: Install test bots

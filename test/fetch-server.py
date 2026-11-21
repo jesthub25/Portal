@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Integration test helper: downloads Paper + WorldEdit for a Minecraft version.
 
-usage: fetch-server.py <mc_version> <out_dir>
+usage: fetch-server.py <mc_version> <out_dir> [worldedit_version_prefix]
 """
 import json
 import os
@@ -52,12 +52,13 @@ def paper_url(mc):
     return f"https://api.papermc.io/v2/projects/paper/versions/{mc}/builds/{b['build']}/downloads/{name}"
 
 
-def worldedit_url(mc):
+def worldedit_url(mc, prefix=""):
     q = urllib.parse.urlencode({
         "game_versions": json.dumps([mc]),
         "loaders": json.dumps(["bukkit", "paper", "spigot"]),
     })
     versions = get_json(f"https://api.modrinth.com/v2/project/worldedit/version?{q}")
+    versions = [v for v in versions if str(v.get("version_number", "")).startswith(prefix)]
     for v in versions:
         for f in v.get("files", []):
             if f.get("filename", "").endswith(".jar") and "bukkit" in f["filename"].lower():
@@ -72,9 +73,10 @@ def worldedit_url(mc):
     allv = get_json("https://api.modrinth.com/v2/project/worldedit/version")
     major = ".".join(mc.split(".")[:2])
     for v in allv:
-        gv = v.get("game_versions", [])
-        print("candidate", v.get("version_number"), v.get("loaders"), gv[:3], "...", gv[-3:])
-    for v in allv:
+        if not str(v.get("version_number", "")).startswith(prefix):
+            continue
+        if "bukkit" not in v.get("loaders", []):
+            continue
         if any(g == mc or g == major or g.startswith(major + ".") for g in v.get("game_versions", [])):
             for f in v.get("files", []):
                 if f.get("filename", "").endswith(".jar"):
@@ -85,9 +87,10 @@ def worldedit_url(mc):
 
 def main():
     mc, out = sys.argv[1], sys.argv[2]
+    prefix = sys.argv[3] if len(sys.argv) > 3 else ""
     os.makedirs(os.path.join(out, "plugins"), exist_ok=True)
     download(paper_url(mc), os.path.join(out, "paper.jar"))
-    download(worldedit_url(mc), os.path.join(out, "plugins", "WorldEdit.jar"))
+    download(worldedit_url(mc, prefix), os.path.join(out, "plugins", "WorldEdit.jar"))
 
 
 if __name__ == "__main__":
