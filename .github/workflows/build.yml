@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  CI_DEBUG_LOGS: '1'
+
 jobs:
   build:
     name: Build (API ${{ matrix.api }})
@@ -20,8 +23,8 @@ jobs:
         # 1.21 = asil derleme; 1.16.5 = en dusuk surumde olmayan API kullanilmadigini dogrular
         api: [ '1.21-R0.1-SNAPSHOT', '1.16.5-R0.1-SNAPSHOT' ]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
@@ -37,7 +40,7 @@ jobs:
           # Java 8 bytecode (major 52) => 1.16.5 sunucularda Java 8 ile de calisir
           unzip -o -q "$JAR" org/jestron/portal/PortalPlugin.class -d /tmp/chk
           file /tmp/chk/org/jestron/portal/PortalPlugin.class | tee /dev/stderr | grep -q "version 52.0"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: matrix.api == '1.21-R0.1-SNAPSHOT'
         with:
           name: Portal-jar
@@ -58,31 +61,48 @@ jobs:
           - mc: '1.21.4'
             java: '21'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           name: Portal-jar
           path: dist
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
+          node-version: '22'
       - name: Download Paper + WorldEdit
         run: |
-          python3 test/fetch-server.py "${{ matrix.mc }}" server
+          set -o pipefail
+          python3 test/fetch-server.py "${{ matrix.mc }}" server 2>&1 | tee fetch.log
           cp dist/Portal-*.jar server/plugins/
           ls -la server server/plugins
       - name: Install test bots
         working-directory: test
         run: npm install --no-audit --no-fund
       - name: Run integration tests
-        run: node test/it.js server "${{ matrix.mc }}"
+        run: |
+          set -o pipefail
+          node test/it.js server "${{ matrix.mc }}" 2>&1 | tee it.log
+      - name: Publish debug logs
+        if: always() && env.CI_DEBUG_LOGS == '1'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          D=$(mktemp -d)
+          cp fetch.log it.log "$D"/ 2>/dev/null || true
+          cp server/logs/latest.log "$D"/server.log 2>/dev/null || true
+          cp server/results.json "$D"/ 2>/dev/null || true
+          ls -la server server/plugins > "$D"/files.txt 2>&1 || true
+          cd "$D" && git init -q && git checkout -q -b "ci-logs-${{ matrix.mc }}"
+          git -c user.name=ci -c user.email=ci@localhost add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -q -m "ci logs ${{ github.sha }}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "ci-logs-${{ matrix.mc }}"
       - name: Upload server logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: server-logs-${{ matrix.mc }}
           path: |
@@ -97,8 +117,8 @@ jobs:
     needs: [ build, integration ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v5
         with:
           name: Portal-jar
           path: dist

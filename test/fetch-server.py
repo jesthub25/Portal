@@ -68,6 +68,18 @@ def worldedit_url(mc):
             if f.get("filename", "").endswith(".jar"):
                 print("WorldEdit", v.get("version_number"))
                 return f["url"]
+    # Bu surum icin listelenmemis: tum surumleri tara, ayni ana surumu (1.16 gibi) destekleyen en yenisini sec
+    allv = get_json("https://api.modrinth.com/v2/project/worldedit/version")
+    major = ".".join(mc.split(".")[:2])
+    for v in allv:
+        gv = v.get("game_versions", [])
+        print("candidate", v.get("version_number"), v.get("loaders"), gv[:3], "...", gv[-3:])
+    for v in allv:
+        if any(g == mc or g == major or g.startswith(major + ".") for g in v.get("game_versions", [])):
+            for f in v.get("files", []):
+                if f.get("filename", "").endswith(".jar"):
+                    print("WorldEdit (fallback)", v.get("version_number"))
+                    return f["url"]
     raise SystemExit(f"No WorldEdit build on Modrinth for {mc}")
 
 
