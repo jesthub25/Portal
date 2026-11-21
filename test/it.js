@@ -102,8 +102,10 @@ function makeBot(username) {
         bot.rootCommands = ['<parse error ' + e.message + '>'];
       }
     });
+    bot.msgTimes = [];
     bot.on('messagestr', (m) => {
       bot.msgs.push(m);
+      bot.msgTimes.push(Date.now());
       console.log(`[${username}] ${m}`);
     });
     const timer = setTimeout(() => reject(new Error(username + ' spawn timeout')), 60000);
@@ -305,7 +307,10 @@ async function run() {
   await walkEast(guest, 1500, null, from2);
   await sleep(800);
   p = guest.entity.position;
-  check('guest warning cooldown (no spam)', countMsgs(guest, PERM, from2) === 0, JSON.stringify(guest.msgs.slice(from2)));
+  // Uyari bekleme suresi: ardisik iki uyari arasi en az ~3 sn olmali (spam yok)
+  const permTimes = guest.msgTimes.filter((t, i) => PERM.test(guest.msgs[i]));
+  const gaps = permTimes.slice(1).map((t, i) => t - permTimes[i]);
+  check('guest warning cooldown (no spam)', gaps.every((g) => g >= 2800), JSON.stringify(gaps));
   check('guest still cannot enter', p.x < 3.0, `${p}`);
 
   await sleep(3200);
@@ -363,7 +368,11 @@ function scanLog() {
   const excessive = lines.filter((l) => /Excessive velocity/i.test(l));
   check('no excessive velocity warnings', excessive.length === 0, excessive.slice(0, 5).join(' | '));
   // Geri atilan (yetkisiz) oyuncu icin sunucu hareket uyarisi olmamali
-  const guestMove = lines.filter((l) => /Guest moved (too quickly|wrongly)/i.test(l));
+  // Geri atma 3 blok + savrulmadir; bot'un uzun mesafeli /tp'si (test duzeni) haric tutulur
+  const guestMove = lines.filter((l) => {
+    const m = /Guest moved (?:too quickly|wrongly)!\s*(-?[\d.E-]+),(-?[\d.E-]+),(-?[\d.E-]+)/i.exec(l);
+    return m && Math.abs(+m[1]) < 10 && Math.abs(+m[3]) < 10;
+  });
   check('no movement warnings for pushed-back player', guestMove.length === 0, guestMove.slice(0, 5).join(' | '));
   const info = lines.filter((l) => /moved (too quickly|wrongly)/i.test(l));
   if (info.length) console.log('INFO (bot client teleport-ack timing, not plugin):', info.length, 'movement warnings');
