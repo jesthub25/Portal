@@ -10,9 +10,6 @@ on:
 permissions:
   contents: write
 
-env:
-  CI_DEBUG_LOGS: '1'
-
 jobs:
   build:
     name: Build (API ${{ matrix.api }})
@@ -91,20 +88,6 @@ jobs:
         run: |
           set -o pipefail
           node test/it.js server "${{ matrix.mc }}" 2>&1 | tee it.log
-      - name: Publish debug logs
-        if: always() && env.CI_DEBUG_LOGS == '1'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          D=$(mktemp -d)
-          cp fetch.log it.log "$D"/ 2>/dev/null || true
-          cp server/logs/latest.log "$D"/server.log 2>/dev/null || true
-          cp server/results.json "$D"/ 2>/dev/null || true
-          ls -la server server/plugins > "$D"/files.txt 2>&1 || true
-          cd "$D" && git init -q && git checkout -q -b "ci-logs-${{ matrix.mc }}"
-          git -c user.name=ci -c user.email=ci@localhost add -A
-          git -c user.name=ci -c user.email=ci@localhost commit -q -m "ci logs ${{ github.sha }}"
-          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "ci-logs-${{ matrix.mc }}"
       - name: Upload server logs
         if: always()
         uses: actions/upload-artifact@v5
@@ -114,6 +97,8 @@ jobs:
             server/logs/
             server/plugins/Portal/
             server/results.json
+            fetch.log
+            it.log
           if-no-files-found: ignore
 
   release:

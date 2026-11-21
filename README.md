@@ -2,7 +2,7 @@
 
 WorldEdit seçimiyle bölge portalı oluşturma eklentisi. **Minecraft 1.16.5 – 1.21.x** (Spigot / Paper / Purpur), Java 8+.
 
-Her sürüm GitHub Actions üzerinde **gerçek Paper 1.16.5 ve 1.21.4 sunucularında, gerçek WorldEdit ve bot oyuncularla** test edilir.
+Her sürüm GitHub Actions üzerinde **gerçek Paper 1.16.5, 1.21.4 ve 1.21.11 sunucularında, gerçek WorldEdit ve bot oyuncularla** test edilir.
 
 ## Kurulum
 
